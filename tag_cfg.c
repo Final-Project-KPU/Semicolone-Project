@@ -63,17 +63,21 @@ void mysql_disconnect (void)
      printf( "Disconnected from database.\r\n");
 }
 
+
 int main(void)
 {
    mysql_connect();
-
-
-
    char query[255];
    int nQuery_stat;
-	
-
-
+   int aa =1;
+   int bb = 2;
+   int cc = 3;
+   sprintf(query,"insert into dist(id, x, y, dis) values(%c,%d,%d,%d);",'c',aa,bb,cc);
+   nQuery_stat = mysql_query(mysql1,query);
+   if(nQuery_stat !=0)
+   {
+	   printf("error\n");
+   }
    int i;
    int wait_period = 5000;
    dwm_cfg_tag_t cfg_tag;
@@ -114,7 +118,6 @@ int main(void)
       HAL_Print("common.uwb_mode     cfg_tag=%d : cfg_node=%d\n", cfg_tag.common.uwb_mode,  cfg_node.common.uwb_mode); 
       HAL_Print("common.fw_update_en cfg_tag=%d : cfg_node=%d\n", cfg_tag.common.fw_update_en, cfg_node.common.fw_update_en);  
       HAL_Print("\nConfiguration failed.\n\n");
-	  
    }
    else
    {
@@ -132,26 +135,22 @@ int main(void)
       HAL_Print("dwm_loc_get(&loc):\n");
       if(dwm_loc_get(&loc) == RV_OK)
       {
+         HAL_Print("\t[%d,%d,%d,%u]\n", loc.p_pos->x, loc.p_pos->y, loc.p_pos->z,
+               loc.p_pos->qf);
+
          for (i = 0; i < loc.anchors.dist.cnt; ++i) 
          {
             HAL_Print("\t%u)", i);
             HAL_Print("0x%llx", loc.anchors.dist.addr[i]);
             if (i < loc.anchors.an_pos.cnt) 
             {
-               HAL_Print("[%d,%d]", loc.anchors.an_pos.pos[i].x,
-                     loc.anchors.an_pos.pos[i].y);
+               HAL_Print("[%d,%d,%d,%u]", loc.anchors.an_pos.pos[i].x,
+                     loc.anchors.an_pos.pos[i].y,
+                     loc.anchors.an_pos.pos[i].z,
+                     loc.anchors.an_pos.pos[i].qf);
             }
             HAL_Print("=%u,%u\n", loc.anchors.dist.dist[i], loc.anchors.dist.qf[i]);
-
-			// query¹® ÀÛ¼º
-			sprintf(query,"insert into distap(id, x, y, dist) values('%d', '%d', '%d', '%d')",i,loc.anchors.an_pos.pos[i].x, loc.anchors.an_pos.pos[i].y, loc.anchors.dist.dist[i]);
-			nQuery_stat = mysql_query(mysql1, query);
-			if(nQuery_stat != 0)
-			{
-				printf("\n------error------\n");
-			}
-
-		 }
+         }
       }
    }
    
